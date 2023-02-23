@@ -1,0 +1,49 @@
+<html>
+	<head><title>Home Page</title></head>
+
+	<body onload = "init()">
+		Welcome to home page.<br>
+		<a href="/">Home page</a><br>
+		<a href="/users">Users page</a><br>
+		<a href="/order">Order page</a><br>
+		<section id = "user_pfrofile_section"></section>
+		<input type = "submit" onclick = "logout()" value = "logout">
+
+	</body>
+	<script>
+		function init(){
+            let req = new XMLHttpRequest();
+            req.onreadystatechange = function (){
+                if(this.readyState == 4 && this.status == 200){
+                    //alert("success!");
+					let user_profile_section = document.getElementById("user_pfrofile_section");
+					let html = "";
+
+					html += `<a href="/users/${JSON.parse(req.responseText)["id"]}">User profile page</a><br>`;
+
+                    let div = document.createElement("div");
+                    div.innerHTML = html;
+					user_profile_section.appendChild(div);					  
+            	};					
+            };
+
+
+            req.open('GET',`/username`, true);
+            req.send();
+		}
+		
+		function logout(){
+            let req = new XMLHttpRequest();
+            req.onreadystatechange = function (){
+                if(this.readyState == 4 && this.status == 200){
+					window.location.href='/';										  
+            	};					
+            };
+
+
+            req.open('GET',`/logout`, true);
+            req.send();		
+		}
+
+	</script>
+</html>

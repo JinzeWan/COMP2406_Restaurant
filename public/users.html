@@ -1,0 +1,63 @@
+<html>
+	<head><title>User Page</title></head>
+
+	<body onload = "init()">
+		User Name: <input type = "text" id = "name"> Password: <input type = "text" id = "pass"><br>
+		<input type = "submit" onclick = "login()" value = "login"><br>
+		<a href="/">Home page</a><br>
+		<a href="/users">Users page</a><br>
+		<a href="/registration">Registration page</a><br>
+		<section id = "user_list"></section>
+    </body>
+
+    <script>
+
+		function init(){
+
+            let req = new XMLHttpRequest();
+            req.onreadystatechange = function (){
+                if(this.readyState == 4 && this.status == 200){
+                    //alert("success!");
+					let list = document.getElementById("user_list");
+					let html = "";
+
+					Object.values(JSON.parse(req.responseText)).forEach(value => { 
+						if(!value["privacy"]){
+							html += `<a href = "/users/${value["_id"].toString()}">User: ${value["username"]}</a><br>`;
+						}
+                	});
+                    let div = document.createElement("div");
+                    div.innerHTML = html;
+					list.appendChild(div);					  
+            	};					
+            };
+
+
+            req.open('GET',`/userlist`, true);
+            req.send();
+		}
+		
+		function login(){
+			let name = document.getElementById("name").value;
+			let password = document.getElementById("pass").value;
+			let u = {};
+			u.username = name;
+			u.password = password;
+
+            let req = new XMLHttpRequest();
+            req.onreadystatechange = function (){
+                if(this.readyState == 4 && this.status == 200){
+                    alert("login success!");
+					window.location.href='/';					
+                }
+                else if(this.readyState == 4 && this.status == 401){
+                    alert("Invalid username or password");
+                }				
+            };
+
+            req.open('POST',`/login`, true);
+            req.setRequestHeader("Content-type", "application/json");
+            req.send(JSON.stringify(u));			
+		}
+	</script>
+</html>

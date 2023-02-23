@@ -1,0 +1,133 @@
+<html>
+	<head><title>User Profile Page</title></head>
+
+	<body onload = "init()">
+		<a href="/">Home page</a><br>
+		<a href="/users">Users page</a><br>
+		<a href="/order">Order page</a><br>
+		<section id = "user_pfrofile_section"></section>
+		<input type = "submit" onclick = "logout()" value = "logout"><br>	        
+        <section id = "userdata"></section><br>
+        <input type = "submit" onclick = "change_privacy()" value = "change privacy"><br>
+        Order: <section id = "order"></section>
+    </body>
+
+    <script>
+        function init(){           
+            let loc = window.location.href;
+            let index = loc.lastIndexOf("\/");
+            let locationId = loc.substring(index + 1, location.length);
+
+            let req = new XMLHttpRequest();
+            req.onreadystatechange = function (){
+                if(this.readyState == 4 && this.status == 200){
+                    let userdata = document.getElementById("userdata");     
+
+					let html = "";
+
+					html += `Name: ${JSON.parse(req.responseText)["username"]}<br>
+                    User ID: ${JSON.parse(req.responseText)["_id"].toString()}<br>`;
+                    if(JSON.parse(req.responseText)["privacy"]){
+                        html += "Privacy: True";
+                    }
+                    else{
+                        html += "Privacy: False";
+                    }
+
+                    let div = document.createElement("div");
+                    div.innerHTML = html;
+					userdata.appendChild(div);                                   
+                }
+                else if(this.readyState == 4 && this.status == 403){
+                    alert("Not authorized");
+                }
+            };
+
+            req.open('GET',`/Profile/${locationId}`, true);
+            req.send();  
+            
+
+            let req1 = new XMLHttpRequest();
+            req1.onreadystatechange = function (){
+                if(this.readyState == 4 && this.status == 200){
+                    //alert("success!");
+					let user_profile_section = document.getElementById("user_pfrofile_section");
+					let html = "";
+
+					html += `<a href="/users/${JSON.parse(req1.responseText)["id"]}">User profile page</a><br>`;
+                    
+                    let u_n = {};
+                    u_n.username = JSON.parse(req1.responseText)["username"];
+
+                    let div = document.createElement("div");
+                    div.innerHTML = html;
+					user_profile_section.appendChild(div);
+                    
+                    let req2 = new XMLHttpRequest();
+                    req2.onreadystatechange = function (){
+                        if(this.readyState == 4 && this.status == 200){
+					        let order_section = document.getElementById("order");
+					        let html = "";
+                            
+                            
+                            Object.values(JSON.parse(req2.responseText)).forEach(value => { 
+							    html += `<a href = "/users/${value["_id"].toString()}">Order ID: ${value["_id"].toString()}</a><br>`;
+                	        });
+
+                            let div = document.createElement("div");
+                            div.innerHTML = html;
+					        order_section.appendChild(div);
+                    
+            	        };					
+                    };
+
+
+                    req2.open('GET',`/userorder`, true);
+                    req2.send(JSON.stringify(u_n));                    
+
+            	};					
+            };
+
+
+            req1.open('GET',`/username`, true);
+            req1.send();            
+        }
+
+        function change_privacy(){
+            let loc = window.location.href;
+            let index = loc.lastIndexOf("\/");
+            let locationId = loc.substring(index + 1, location.length);
+
+            let req = new XMLHttpRequest();
+            req.onreadystatechange = function (){
+                if(this.readyState == 4 && this.status == 200){
+					window.location.href=`/users/${locationId}`;
+                    alert("Successfully changing Privacy");										  
+            	}
+                else if(this.readyState == 4 && this.status == 403){
+                    alert("Not authorized");
+                }					
+            };
+
+
+            req.open('PUT',`/changeprivacy/${locationId}`, true);
+            req.send();		
+		            
+        }
+
+		function logout(){
+            let req = new XMLHttpRequest();
+            req.onreadystatechange = function (){
+                if(this.readyState == 4 && this.status == 200){
+					window.location.href='/';										  
+            	};					
+            };
+
+
+            req.open('GET',`/logout`, true);
+            req.send();		
+		}		
+    
+    </script>
+
+</html>

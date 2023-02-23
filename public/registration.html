@@ -1,0 +1,86 @@
+<html>
+	<head><title>Registration Page</title></head>
+
+	<body>
+		Welcome to Registration page.<br>
+		User Name: <input type = "text" id = "name"> Password: <input type = "text" id = "pass"><br>
+		<input type = "submit" onclick = "login()" value = "login"><br>		
+		<a href="/">Home page</a><br>
+		<a href="/users">Users page</a><br>
+		<a href="/registration">Registration page</a><br>
+        User Name: <input type = "text" id = "userName"><br>
+        User Password: <input type = "text" id = "password"><br>
+        <input type = "submit" onclick = "submit()">
+    </body>
+    <script>
+		let mongo = require('mongodb');
+		let MongoClient = mongo.MongoClient;
+		let db;
+
+		function submit(){
+			let name = document.getElementById("userName").value;
+    		let password = document.getElementById("password").value;
+    		let u = {};
+    		u.username =  name;
+    		u.password = password;
+    		u.privacy = false;
+
+            let req = new XMLHttpRequest();
+            req.onreadystatechange = function (){
+                if(this.readyState == 4 && this.status == 200){
+                    alert("submit success!");
+
+					let nu = {};
+					nu.username = name;
+					nu.password = password;
+
+            		let req1 = new XMLHttpRequest();
+            		req1.onreadystatechange = function (){
+                		if(this.readyState == 4 && this.status == 200){
+							window.location.href=`/users/${JSON.parse(req1.responseText)["id"]}`;					
+                		}
+                		else if(this.readyState == 4 && this.status == 401){
+                    		alert("Invalid username or password");
+                		}				
+            		};
+
+            		req1.open('POST',`/login`, true);
+            		req1.setRequestHeader("Content-type", "application/json");
+            		req1.send(JSON.stringify(nu));
+                }
+
+				else if(this.readyState == 4 && this.status == 401){
+                    alert("user exist!");
+                }
+            };
+
+            req.open('PUT',`/registration`, true);
+            req.setRequestHeader("Content-type", "application/json");
+            req.send(JSON.stringify(u));
+			
+		}	
+		
+		function login(){
+			let name = document.getElementById("name").value;
+			let password = document.getElementById("pass").value;
+			let u = {};
+			u.username = name;
+			u.password = password;
+
+            let req = new XMLHttpRequest();
+            req.onreadystatechange = function (){
+                if(this.readyState == 4 && this.status == 200){
+                    alert("login success!");
+					window.location.href='/';					
+                }
+                else if(this.readyState == 4 && this.status == 401){
+                    alert("Invalid username or password");
+                }				
+            };
+
+            req.open('POST',`/login`, true);
+            req.setRequestHeader("Content-type", "application/json");
+            req.send(JSON.stringify(u));			
+		}		
+	</script>
+</html>

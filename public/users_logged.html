@@ -1,0 +1,73 @@
+<html>
+	<head><title>User Page</title></head>
+
+	<body onload = "init()">
+		<a href="/">Home page</a><br>
+		<a href="/users">Users page</a><br>
+		<a href="/order">Order page</a><br>
+		<section id = "user_pfrofile_section"></section>
+		<input type = "submit" onclick = "logout()" value = "logout"><br>		
+		<section id = "user_list"></section>
+    </body>
+
+    <script>
+
+		function init(){
+            let req1 = new XMLHttpRequest();
+            req1.onreadystatechange = function (){
+                if(this.readyState == 4 && this.status == 200){
+                    //alert("success!");
+					let user_profile_section = document.getElementById("user_pfrofile_section");
+					let html = "";
+
+					html += `<a href="/users/${JSON.parse(req1.responseText)["id"]}">User profile page</a><br>`;
+
+                    let div = document.createElement("div");
+                    div.innerHTML = html;
+					user_profile_section.appendChild(div);					  
+            	};					
+            };
+
+
+            req1.open('GET',`/username`, true);
+            req1.send();	
+
+            let req = new XMLHttpRequest();
+            req.onreadystatechange = function (){
+                if(this.readyState == 4 && this.status == 200){
+                    //alert("success!");
+					let list = document.getElementById("user_list");
+					let html = "";
+
+					Object.values(JSON.parse(req.responseText)).forEach(value => { 
+						if(!value["privacy"]){
+							html += `<a href = "/users/${value["_id"].toString()}">User: ${value["username"]}</a><br>`;
+						}
+                	});
+                    let div = document.createElement("div");
+                    div.innerHTML = html;
+					list.appendChild(div);					  
+            	};					
+            };
+
+
+            req.open('GET',`/userlist`, true);
+            req.send();
+
+		}
+
+		function logout(){
+            let req = new XMLHttpRequest();
+            req.onreadystatechange = function (){
+                if(this.readyState == 4 && this.status == 200){
+					window.location.href='/';										  
+            	};					
+            };
+
+
+            req.open('GET',`/logout`, true);
+            req.send();		
+		}		
+
+	</script>
+</html>

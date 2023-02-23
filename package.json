@@ -1,0 +1,16 @@
+{
+  "name": "a4-data",
+  "version": "1.0.0",
+  "main": "database-initializer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^4.2.1"
+  },
+  "devDependencies": {},
+  "description": "Jinze Wan\r 101168891\r use mongodb to connect to database, then Initializing the User, run server.js"
+}
